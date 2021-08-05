@@ -123,7 +123,7 @@ class QRCaptureView(private val registrar: PluginRegistry.Registrar, id: Int) :
         barcode.resume()
 
         registrar.activity().application.registerActivityLifecycleCallbacks(
-         object : Application.ActivityLifecycleCallbacks {
+         object : android.app.Application.ActivityLifecycleCallbacks {
              override fun onActivityPaused(p0: Activity?) {
                  if (p0 == registrar.activity()) {
                      barcodeView?.pause()
