@@ -136,7 +136,7 @@ class QRCaptureView(private val registrar: PluginRegistry.Registrar, id: Int) :
                  }
              }
 
-             override fun onActivityStarted(p0: Activity?) {
+             override fun onActivityStarted(p0: Activity) {
              }
 
              override fun onActivityDestroyed(p0: Activity) {
@@ -148,7 +148,7 @@ class QRCaptureView(private val registrar: PluginRegistry.Registrar, id: Int) :
              override fun onActivityStopped(p0: Activity) {
              }
 
-             override fun onActivityCreated(p0: Activity, p1: Bundle) {
+             override fun onActivityCreated(p0: Activity, p1: Bundle?) {
              }
 
          }
