@@ -77,11 +77,15 @@ class QRCaptureView(private val registrar: PluginRegistry.Registrar, id: Int) :
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestingPermission = true
-                registrar
-                        .activity()
-                        .requestPermissions(
-                                arrayOf(Manifest.permission.CAMERA),
-                                CAMERA_REQUEST_ID)
+                    if(registrar.activity() != null) {
+                            
+                        registrar
+                                .activity()
+                                .requestPermissions(
+                                        arrayOf(Manifest.permission.CAMERA),
+                                        CAMERA_REQUEST_ID)
+                                
+                    }
             }
         }
     }
