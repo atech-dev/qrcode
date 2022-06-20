@@ -1,5 +1,7 @@
 package com.example.qrcode
 
+import androidx.annotation.NonNull
+
 import android.Manifest
 import android.app.Activity
 import android.app.Application
@@ -14,15 +16,22 @@ import android.hardware.Camera.CameraInfo
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.BarcodeView
+
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+import io.flutter.plugin.common.MethodChannel.Result
+
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformView
 
-class QRCaptureView(private val registrar: PluginRegistry.Registrar, id: Int) :
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+
+public class NewQRCaptureView(private val messenger: BinaryMessenger, private val activityPluginBinding: ActivityPluginBinding?, id: Int) :
         PlatformView, MethodCallHandler {
-    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+
+    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when(call?.method){
             "checkAndRequestPermission" -> {
                 checkAndRequestPermission(result)
@@ -77,9 +86,9 @@ class QRCaptureView(private val registrar: PluginRegistry.Registrar, id: Int) :
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestingPermission = true
-                    if(registrar.activity() != null) {
-                            
-                        registrar.activity()!!.requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_ID)
+                    if(activityPluginBinding!!.getActivity() != null) {
+
+                        activityPluginBinding!!.getActivity().requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_ID)
                                 
                     }
             }
@@ -91,67 +100,66 @@ class QRCaptureView(private val registrar: PluginRegistry.Registrar, id: Int) :
                 activity.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
     }
 
-
     companion object {
         const val CAMERA_REQUEST_ID = 513469796
     }
 
     var barcodeView: BarcodeView? = null
-    private val activity = registrar.activity()!!
+    private val activity = activityPluginBinding!!.getActivity()
     var cameraPermissionContinuation: Runnable? = null
     var requestingPermission = false
-    val channel: MethodChannel
+    var channel: MethodChannel
 
     init {
-        registrar.addRequestPermissionsResultListener(CameraRequestPermissionsListener())
-        channel = MethodChannel(registrar.messenger(), "plugins/qr_capture/method_$id")
+        activityPluginBinding!!.addRequestPermissionsResultListener(CameraRequestPermissionsListener())
+        channel = MethodChannel(messenger, "plugins/qr_capture/method_$id")
         channel.setMethodCallHandler(this)
         checkAndRequestPermission(null)
 
-        val barcode = BarcodeView(registrar.activity())
+        val barcode = BarcodeView(activityPluginBinding!!.getActivity())
         this.barcodeView = barcode
         barcode.decodeContinuous(
-                object : BarcodeCallback {
-                    override fun barcodeResult(result: BarcodeResult) {
-                        channel.invokeMethod("onCaptured", result.text)
-                    }
-
-                    override fun possibleResultPoints(resultPoints: List<ResultPoint>) {}
+            object : BarcodeCallback {
+                override fun barcodeResult(result: BarcodeResult) {
+                    channel.invokeMethod("onCaptured", result.text)
                 }
+
+                override fun possibleResultPoints(resultPoints: List<ResultPoint>) {}
+            }
         )
 
         barcode.resume()
 
-        registrar.activity()!!.application.registerActivityLifecycleCallbacks(
-         object : android.app.Application.ActivityLifecycleCallbacks {
-             override fun onActivityPaused(p0: Activity) {
-                 if (p0 == registrar.activity()) {
-                     barcodeView?.pause()
-                 }
-             }
+        activityPluginBinding!!.getActivity().application.registerActivityLifecycleCallbacks(
+            object : android.app.Application.ActivityLifecycleCallbacks {
+                override fun onActivityPaused(p0: Activity) {
+                    if (p0 == activityPluginBinding!!.getActivity()) {
+                        barcodeView?.pause()
+                    }
+                }
 
-             override fun onActivityResumed(p0: Activity) {
-                 if (p0 == registrar.activity()) {
-                     barcodeView?.resume()
-                 }
-             }
+                override fun onActivityResumed(p0: Activity) {
+                    if (p0 == activityPluginBinding!!.getActivity()) {
+                        barcodeView?.resume()
+                    }
+                }
 
-             override fun onActivityStarted(p0: Activity) {
-             }
+                override fun onActivityStarted(p0: Activity) {
+                }
 
-             override fun onActivityDestroyed(p0: Activity) {
-             }
+                override fun onActivityDestroyed(p0: Activity) {
+                }
 
-             override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) {
-             }
+                override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) {
+                }
 
-             override fun onActivityStopped(p0: Activity) {
-             }
+                override fun onActivityStopped(p0: Activity) {
+                }
 
-             override fun onActivityCreated(p0: Activity, p1: Bundle?) {
-             }
+                override fun onActivityCreated(p0: Activity, p1: Bundle?) {
+                }
 
-         }
+            }
         )
     }
 
@@ -163,6 +171,12 @@ class QRCaptureView(private val registrar: PluginRegistry.Registrar, id: Int) :
         barcodeView?.pause()
         barcodeView = null
     }
+
+    /*
+    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+        channel.setMethodCallHandler(null)
+    }
+    */
 
     private inner class CameraRequestPermissionsListener : PluginRegistry.RequestPermissionsResultListener {
         override fun onRequestPermissionsResult(id: Int, permissions: Array<String>, grantResults: IntArray): Boolean {

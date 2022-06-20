@@ -13,3 +13,7 @@
 ## 1.0.4
 
 * add barCode scan for iOS
+
+## 2.0.0
+
+* upgrade to Android V2

@@ -8,28 +8,26 @@ typedef CaptureCallback(String data);
 enum CaptureTorchMode { on, off }
 
 class QRCaptureController {
-  MethodChannel _methodChannel; 
-  CaptureCallback _capture; 
-  
-  QRCaptureController();
+  MethodChannel? _methodChannel;
+  CaptureCallback? _capture;
 
   void _onPlatformViewCreated(int id) {
     _methodChannel = MethodChannel('plugins/qr_capture/method_$id');
-    _methodChannel.setMethodCallHandler((MethodCall call) async {
+    _methodChannel!.setMethodCallHandler((MethodCall call) async {
       if (call.method == 'onCaptured') { 
         if (_capture != null && call.arguments != null) {
-          _capture(call.arguments.toString());
+          _capture!(call.arguments.toString());
         }
       }
     });
   }
 
   void pause() {
-    _methodChannel?.invokeMethod('pause');
+    _methodChannel!.invokeMethod('pause');
   }
 
   void resume() {
-    _methodChannel?.invokeMethod('resume');
+    _methodChannel!.invokeMethod('resume');
   }
 
   void onCapture(CaptureCallback capture) {
@@ -38,13 +36,13 @@ class QRCaptureController {
 
   set torchMode(CaptureTorchMode mode) {
     var isOn = mode == CaptureTorchMode.on;
-    _methodChannel?.invokeMethod('setTorchMode', isOn);
+    _methodChannel!.invokeMethod('setTorchMode', isOn);
   }
 }
 
 class QRCaptureView extends StatefulWidget {
-  final QRCaptureController controller;
-  QRCaptureView({Key key, this.controller}) : super(key: key);
+  final QRCaptureController? controller;
+  QRCaptureView({Key? key, this.controller}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -61,14 +59,14 @@ class QRCaptureViewState extends State<QRCaptureView> {
       viewType: 'plugins/qr_capture_view',
       creationParamsCodec: StandardMessageCodec(),
       onPlatformViewCreated: (id) {
-          widget.controller._onPlatformViewCreated(id);
+          widget.controller!._onPlatformViewCreated(id);
         },
       );
     } else {
       return AndroidView(viewType: 'plugins/qr_capture_view',
         creationParamsCodec: StandardMessageCodec(),
         onPlatformViewCreated: (id) {
-          widget.controller._onPlatformViewCreated(id);
+          widget.controller!._onPlatformViewCreated(id);
         },
       );
     }

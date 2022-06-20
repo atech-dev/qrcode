@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/android.iml" filepath="$PROJECT_DIR$/android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/qrcode.iml" filepath="$PROJECT_DIR$/.idea/modules/qrcode.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/qrcode.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/qrcode.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/qrcode.main.iml" filepath="$PROJECT_DIR$/.idea/modules/qrcode.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/qrcode.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/qrcode.unitTest.iml" />
     </modules>
   </component>
 </project>
